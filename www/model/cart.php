@@ -118,18 +118,47 @@ function purchase_carts($db, $carts)
             $cart['stock'] - $cart['amount']
         ) === false) {
             set_error($cart['name'] . 'の購入に失敗しました。');
-        } else {
-            $price = get_user_carts($db, $cart['user_id'])[0]['price'];
+        }
+        $user_id = $cart['user_id'];
+    }
+    if (count($_SESSION['__errors']) === 0) {
+        $db->beginTransaction();
+
+        $total_price = sum_carts($carts);
+        $sql = "
+          INSERT INTO
+            orders(user_id, total_price)
+          VALUES(
+            {$user_id}, {$total_price}
+          )";
+        execute_query($db, $sql);
+
+        $sql = "
+          SELECT id FROM orders 
+          WHERE user_id = {$user_id} 
+          ORDER BY id desc LIMIT 1
+          ";
+        $order_id = fetch_query($db, $sql)['id'];
+        foreach ($carts as $cart) {
+            $price = get_user_cart($db, $user_id, $cart['item_id'])['price'];
             $sql = "
-              INSERT INTO
-                orders(user_id, item_id, amount, price)
-              VALUES(
-                {$cart['user_id']}, {$cart['item_id']}, {$cart['amount']}, {$price}
-              )";
+            INSERT INTO
+              order_detail(order_id, user_id, item_id, amount, price)
+            VALUES(
+              {$order_id}, {$user_id}, {$cart['item_id']}, {$cart['amount']}, $price
+            )";
             execute_query($db, $sql);
         }
+
+        if (count($_SESSION['__errors']) === 0) {
+            $db->commit();
+            return true;
+        } else {
+            $db->rollback();
+            return false;
+        }
     }
-  
+
     delete_user_carts($db, $carts[0]['user_id']);
 }
 

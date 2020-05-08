@@ -4,6 +4,7 @@ require_once MODEL_PATH . 'functions.php';
 require_once MODEL_PATH . 'user.php';
 require_once MODEL_PATH . 'item.php';
 require_once MODEL_PATH . 'cart.php';
+require_once MODEL_PATH . 'order.php';
 
 session_start();
 
@@ -11,11 +12,14 @@ if (is_logined() === false) {
     redirect_to(LOGIN_URL);
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $order_id = $_POST['order_id'];
+} else {
+    redirect_to(ORDER_URL);
+}
+
 $db = get_db_connect();
-$user = get_login_user($db);
+$items = get_order_data($db, $order_id);
 
-$carts = get_user_carts($db, $user['user_id']);
 
-$total_price = sum_carts($carts);
-
-include_once VIEW_PATH . 'cart_view.php';
+include_once VIEW_PATH . 'order_detail_view.php';
