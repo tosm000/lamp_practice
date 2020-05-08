@@ -6,13 +6,22 @@ require_once '../model/item.php';
 
 session_start();
 
-if(is_logined() === false){
-  redirect_to(LOGIN_URL);
+if (is_logined() === false) {
+    redirect_to(LOGIN_URL);
 }
 
 $db = get_db_connect();
 $user = get_login_user($db);
 
-$items = get_open_items($db);
+if (isset($_GET['orderby'])) {
+    $orderby = $_GET['orderby'];
+    $items = change_orderby($db, $orderby);
+} else {
+    $orderby = '';
+    $items = get_open_items($db);
+}
+
+
+
 
 include_once VIEW_PATH . 'index_view.php';
