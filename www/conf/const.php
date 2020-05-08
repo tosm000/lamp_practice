@@ -6,7 +6,7 @@ define('VIEW_PATH', $_SERVER['DOCUMENT_ROOT'] . '/../view/');
 
 define('IMAGE_PATH', '/assets/images/');
 define('STYLESHEET_PATH', '/assets/css/');
-define('IMAGE_DIR', $_SERVER['DOCUMENT_ROOT'] . '/assets/images/' );
+define('IMAGE_DIR', $_SERVER['DOCUMENT_ROOT'] . '/assets/images/');
 
 define('DB_HOST', 'mysql');
 define('DB_NAME', 'sample');
@@ -49,3 +49,5 @@ define('PERMITTED_IMAGE_TYPES', array(
   IMAGETYPE_JPEG => 'jpg',
   IMAGETYPE_PNG => 'png',
 ));
+
+define('ORDER_URL', '/order.php');
